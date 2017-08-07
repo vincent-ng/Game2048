@@ -15,5 +15,14 @@
   npm i
   node node_modules/webpack/bin/webpack.js
   ```
-  browse open ui/html/dist/index.html
+  browser open ui/html/dist/index.html
 
+* Use as a lib
+
+  * Using in ES6 env, just include ./lib/index.js
+  * Using in browser
+    ```bash
+    npm i
+    node node_modules/webpack/bin/webpack.js
+    # find the target file in dist/index.js
+    ```
