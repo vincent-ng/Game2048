@@ -19,11 +19,15 @@ const Config = {
 		1024: 'magenta',
 		2048: 'magenta',
 	},
-	FontHeight: 1,
+	FontHeight: 0,
 }
 
-function getMiddle(outter, inner) {
-	return Math.floor((outter - inner) / 2)
+function measureTextWidth(ctx, text) {
+	return ctx.measureText ? ctx.measureText(text).width : text.length
+}
+
+function getMiddle(outter, inner, drawBottomUp = false) {
+	return Math.floor((drawBottomUp ? outter + inner : outter - inner) / 2)
 }
 
 function drawEmptyTile(ctx, { x, y }, color) {
@@ -46,7 +50,7 @@ function drawTile(ctx, offset, value) {
 	drawEmptyTile(ctx, offset, color)
 	const text = String(value)
 	ctx.fillStyle = Config.TileColor.Text
-	ctx.fillText(text, offset.x + getMiddle(Config.TileSize.Width, text.length), offset.y + getMiddle(Config.TileSize.Height, Config.FontHeight))
+	ctx.fillText(text, offset.x + getMiddle(Config.TileSize.Width, measureTextWidth(ctx, text)), offset.y + getMiddle(Config.TileSize.Height, Config.FontHeight, true))
 }
 
 function draw(ctx, grid) {
@@ -91,8 +95,7 @@ function promoteMsg(ctx, msg = '', promoter = '> ') {
 	ctx.save()
 	ctx.fillStyle = Config.TileColor.Text
 	if (msg) {
-		const indent = ctx.measureText ? ctx.measureText(promoter).width : promoter.length
-		ctx.fillText(msg, indent, ctx.canvas.height - Config.FontHeight)
+		ctx.fillText(msg, getMiddle(ctx.canvas.width, measureTextWidth(ctx, msg)), Config.FontHeight)
 	}
 	ctx.fillText(promoter, 0, ctx.canvas.height)
 	ctx.restore()

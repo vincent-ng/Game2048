@@ -2,12 +2,7 @@ const Canvas = require('term-canvas')
 const keypress = require('keypress')
 const Grid = require('../../lib')
 const drawer = require('../common/canvasDrawer.js')
-
-const Message = {
-	Usage: 'Usage: Arrow key to play. Enter to restart. ESC to exit.',
-	Negative: 'Can not merge.',
-	GameOver: 'Game Over! Please restart.',
-}
+const messager = require('../common/messager.js')
 
 // make stdout faster
 function debounceStdout() {
@@ -21,16 +16,15 @@ function debounceStdout() {
 		})
 	}
 }
-
-let grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
-grid.randomTile(2)
-
 debounceStdout()
 
 const canvas = new Canvas(...process.stdout.getWindowSize())
 const ctx = canvas.getContext('2d')
+
+let grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
+grid.randomTile(2)
 drawer.draw(ctx, grid)
-drawer.promoteMsg(ctx, Message.Usage)
+drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
 
 const stdin = process.stdin
 keypress(stdin)
@@ -42,13 +36,16 @@ process.stdin.on('keypress', (ch, key) => {
 		// console.log(ch)
 		return
 	}
-	let msg = String(key.name)
+	if (grid.isAccomplished() && key.name !== 'return') {
+		return
+	}
 	switch (key.name) {
 		case 'c':
 			if (key.ctrl) {
 				process.exit(0)
 			}
 			break
+		case 'q':
 		case 'escape':
 			process.exit(0)
 			break
@@ -58,43 +55,31 @@ process.stdin.on('keypress', (ch, key) => {
 			break
 		case 'up':
 			grid.mergeToYNegative()
-			if (grid.isFull()) {
-				msg = Message.Negative
-				break
+			if (!grid.isFull()) {
+				grid.randomTile(1)
 			}
-			grid.randomTile(1)
 			break
 		case 'right':
 			grid.mergeToXPositive()
-			if (grid.isFull()) {
-				msg = Message.Negative
-				break
+			if (!grid.isFull()) {
+				grid.randomTile(1)
 			}
-			grid.randomTile(1)
 			break
 		case 'down':
 			grid.mergeToYPositive()
-			if (grid.isFull()) {
-				msg = Message.Negative
-				break
+			if (!grid.isFull()) {
+				grid.randomTile(1)
 			}
-			grid.randomTile(1)
 			break
 		case 'left':
 			grid.mergeToXNegative()
-			if (grid.isFull()) {
-				msg = Message.Negative
-				break
+			if (!grid.isFull()) {
+				grid.randomTile(1)
 			}
-			grid.randomTile(1)
 			break
 		default:
-			msg = Message.Usage
 			break
 	}
 	drawer.draw(ctx, grid)
-	if (grid.isGameOver()) {
-		msg = Message.GameOver
-	}
-	drawer.promoteMsg(ctx, msg)
+	drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
 })
