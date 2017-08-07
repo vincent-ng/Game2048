@@ -1,5 +1,9 @@
 # Game 2048
 
+## Demo
+
+[Play Online](https://vincentngthu.github.io/Game2048/)
+
 ## Usage
 
 * Run with term
