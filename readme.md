@@ -3,20 +3,22 @@
 ## Usage
 
 * Run with term
+
   ```bash
-  cd ui/terminal
-  npm i
-  node .
-  ```
+    cd ui/terminal
+    npm i
+    node .
+  ```
   
   ![term](https://user-images.githubusercontent.com/6469269/29011653-62aa881c-7b67-11e7-84f4-04de6f551888.png)
 
 
 * Run with browser
+
   ```bash
-  cd ui/html
-  npm i
-  node node_modules/webpack/bin/webpack.js
+    cd ui/html
+    npm i
+    node node_modules/webpack/bin/webpack.js
   ```
   browser open ui/html/dist/index.html
 
@@ -27,8 +29,9 @@
 
   * Using in ES6 env, just include ./lib/index.js
   * Using in browser
+
     ```bash
-    npm i
-    node node_modules/webpack/bin/webpack.js
-    # find the target file in dist/index.js
+      npm i
+      node node_modules/webpack/bin/webpack.js
+      # find the target file in dist/index.js
     ```
