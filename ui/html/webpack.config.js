@@ -5,7 +5,7 @@ module.exports = {
 	entry: ['babel-polyfill', './index.js'],
 	// entry: ['./index.js'], // remove polyfill, no IE supported
 	output: {
-		path: `${__dirname}/dist`,
+		path: `${__dirname}/../../docs`,
 		filename: 'index.js',
 	},
 	module: {

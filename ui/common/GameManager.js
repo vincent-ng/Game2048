@@ -27,37 +27,30 @@ class GameManager {
 		if (this.grid.isAccomplished() && input !== GameManager.Key.Restart) {
 			return
 		}
+
+		let moved = false
 		switch (input) {
 			case GameManager.Key.Restart:
 				this.grid = new Grid(this.gridSize, this.gridSize)
 				this.grid.randomTile(2)
 				break
 			case GameManager.Key.Up:
-				this.grid.mergeToYNegative()
-				if (!this.grid.isFull()) {
-					this.grid.randomTile(1)
-				}
+				moved = this.grid.mergeToYNegative()
 				break
 			case GameManager.Key.Right:
-				this.grid.mergeToXPositive()
-				if (!this.grid.isFull()) {
-					this.grid.randomTile(1)
-				}
+				moved = this.grid.mergeToXPositive()
 				break
 			case GameManager.Key.Down:
-				this.grid.mergeToYPositive()
-				if (!this.grid.isFull()) {
-					this.grid.randomTile(1)
-				}
+				moved = this.grid.mergeToYPositive()
 				break
 			case GameManager.Key.Left:
-				this.grid.mergeToXNegative()
-				if (!this.grid.isFull()) {
-					this.grid.randomTile(1)
-				}
+				moved = this.grid.mergeToXNegative()
 				break
 			default:
 				break
+		}
+		if (moved && !this.grid.isFull()) {
+			this.grid.randomTile(1)
 		}
 		drawer.draw(this.ctx, this.grid)
 		drawer.promoteMsg(this.ctx, messager.getStatusMsg(this.grid), input)
