@@ -1,8 +1,6 @@
 const Canvas = require('term-canvas')
 const keypress = require('keypress')
-const Grid = require('../../lib')
-const drawer = require('../common/canvasDrawer.js')
-const messager = require('../common/messager.js')
+const GameManager = require('../common/GameManager.js')
 
 // make stdout faster
 function debounceStdout() {
@@ -19,67 +17,30 @@ function debounceStdout() {
 debounceStdout()
 
 const canvas = new Canvas(...process.stdout.getWindowSize())
-const ctx = canvas.getContext('2d')
+const gm = new GameManager(canvas)
 
-let grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
-grid.randomTile(2)
-drawer.draw(ctx, grid)
-drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
+const InputMap = {
+	return: GameManager.Key.Restart,
+	up: GameManager.Key.Up,
+	right: GameManager.Key.Right,
+	down: GameManager.Key.Down,
+	left: GameManager.Key.Left,
+}
 
 const stdin = process.stdin
 keypress(stdin)
 stdin.setRawMode(true)
 stdin.resume()
 stdin.setEncoding('utf8')
-process.stdin.on('keypress', (ch, key) => {
+stdin.on('keypress', (ch, key) => {
 	if (!key) {
-		// console.log(ch)
 		return
 	}
-	if (grid.isAccomplished() && key.name !== 'return') {
-		return
+	if ((key.name === 'c' && key.ctrl) ||
+		key.name === 'q' ||
+		key.name === 'escape'
+	) {
+		process.exit(0)
 	}
-	switch (key.name) {
-		case 'c':
-			if (key.ctrl) {
-				process.exit(0)
-			}
-			break
-		case 'q':
-		case 'escape':
-			process.exit(0)
-			break
-		case 'return':
-			grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
-			grid.randomTile(2)
-			break
-		case 'up':
-			grid.mergeToYNegative()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'right':
-			grid.mergeToXPositive()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'down':
-			grid.mergeToYPositive()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'left':
-			grid.mergeToXNegative()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		default:
-			break
-	}
-	drawer.draw(ctx, grid)
-	drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
+	gm.handleInput(InputMap[key.name])
 })

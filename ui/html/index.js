@@ -1,11 +1,8 @@
-const Grid = require('../../lib')
 const drawer = require('../common/canvasDrawer.js')
-const messager = require('../common/messager.js')
+const GameManager = require('../common/GameManager.js')
+const Hammer = require('hammerjs')
 
-const canvas = document.getElementById('myCanvas')
-const ctx = canvas.getContext('2d')
-
-ctx.font = '24px serif'
+// drawer.Config.font = '24px serif'
 drawer.Config.GridBorderSize.Width = 10
 drawer.Config.GridBorderSize.Height = 10
 drawer.Config.TileBorderSize.Width = 10
@@ -15,53 +12,35 @@ drawer.Config.TileSize.Height = 100
 drawer.Config.TileLevelColor[2] = 'gray'
 drawer.Config.FontHeight = 24
 
-let grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
-grid.randomTile(2)
-drawer.draw(ctx, grid)
-drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
+const canvas = document.getElementById('myCanvas')
+const gm = new GameManager(canvas)
 
+const InputMap = {
+	Enter: GameManager.Key.Restart,
+	ArrowUp: GameManager.Key.Up,
+	ArrowRight: GameManager.Key.Right,
+	ArrowDown: GameManager.Key.Down,
+	ArrowLeft: GameManager.Key.Left,
+	Up: GameManager.Key.Up,
+	Right: GameManager.Key.Right,
+	Down: GameManager.Key.Down,
+	Left: GameManager.Key.Left,
+	[Hammer.DIRECTION_UP]: GameManager.Key.Up,
+	[Hammer.DIRECTION_RIGHT]: GameManager.Key.Right,
+	[Hammer.DIRECTION_DOWN]: GameManager.Key.Down,
+	[Hammer.DIRECTION_LEFT]: GameManager.Key.Left,
+}
+
+// keyboard
 const onKeydown = (document.attachEvent || document.addEventListener).bind(document)
 onKeydown('keydown', (e) => {
-	const cmd = e.keyIdentifier || e.key
-	if (grid.isAccomplished() && cmd !== 'Enter') {
-		return
-	}
-	switch (cmd) {
-		case 'Enter':
-			grid = new Grid(drawer.Config.GridSize, drawer.Config.GridSize)
-			grid.randomTile(2)
-			break
-		case 'ArrowUp':
-		case 'Up':
-			grid.mergeToYNegative()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'ArrowRight':
-		case 'Right':
-			grid.mergeToXPositive()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'ArrowDown':
-		case 'Down':
-			grid.mergeToYPositive()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		case 'ArrowLeft':
-		case 'Left':
-			grid.mergeToXNegative()
-			if (!grid.isFull()) {
-				grid.randomTile(1)
-			}
-			break
-		default:
-			break
-	}
-	drawer.draw(ctx, grid)
-	drawer.promoteMsg(ctx, messager.getStatusMsg(grid))
+	const key = e.keyIdentifier || e.key
+	gm.handleInput(InputMap[key])
+})
+
+// touch
+const hammer = new Hammer(document)
+hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL })
+hammer.on('swipe', (e) => {
+	gm.handleInput(InputMap[e.direction])
 })

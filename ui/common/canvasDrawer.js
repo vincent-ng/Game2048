@@ -1,5 +1,4 @@
 const Config = {
-	GridSize: 4,
 	GridBorderSize: { Width: 2, Height: 1 },
 	GridColor: { Background: 'white' },
 	TileSize: { Width: 9, Height: 5 },
@@ -19,6 +18,7 @@ const Config = {
 		1024: 'magenta',
 		2048: 'magenta',
 	},
+	Font: '24px serif',
 	FontHeight: 0,
 }
 
@@ -56,6 +56,7 @@ function drawTile(ctx, offset, value) {
 function draw(ctx, grid) {
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 	ctx.save()
+	ctx.font = Config.Font
 
 	const gridStart = {
 		x: getMiddle(ctx.canvas.width, Config.TileSize.Width * grid.width),
@@ -91,13 +92,14 @@ function draw(ctx, grid) {
 	ctx.restore()
 }
 
-function promoteMsg(ctx, msg = '', promoter = '> ') {
+function promoteMsg(ctx, msg = '', input = '') {
 	ctx.save()
+	ctx.font = Config.Font
 	ctx.fillStyle = Config.TileColor.Text
 	if (msg) {
 		ctx.fillText(msg, getMiddle(ctx.canvas.width, measureTextWidth(ctx, msg)), Config.FontHeight)
 	}
-	ctx.fillText(promoter, 0, ctx.canvas.height)
+	ctx.fillText(`> ${input}`, 0, ctx.canvas.height)
 	ctx.restore()
 }
 
